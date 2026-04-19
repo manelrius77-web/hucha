@@ -24,20 +24,16 @@ workflows:
           cd frontend
           npx cap sync ios
 
-      - name: CocoaPods install
-        script: |
-          cd frontend/ios/App
-          pod install
-
       - name: Build iOS (no firma)
         script: |
           cd frontend/ios/App
           xcodebuild -workspace App.xcworkspace \
-          -scheme App \
-          -sdk iphoneos \
-          -configuration Release \
-          archive -archivePath $HOME/build/App.xcarchive \
-          CODE_SIGNING_ALLOWED=NO
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Release \
+            archive -archivePath $HOME/build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
 
     artifacts:
-      - $HOME/build/*.xcarchive
+      - $HOME/build/App.xcarchive
+      - /tmp/xcodebuild_logs/*.log
