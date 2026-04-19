@@ -1,0 +1,84 @@
+{
+  "theme": "Light",
+  "archetype": "Archetype 3 (Pastel & Soft) mixed with Neo-Brutalism (E1 twist)",
+  "colors": {
+    "background": "#FDFBF7",
+    "primary_text": "#1A1A1A",
+    "accents": {
+      "mint": "#A8E6CF",
+      "lavender": "#DCD3FF",
+      "peach": "#FFD3B6",
+      "coral": "#FF9B9B",
+      "yellow": "#FFE8A1"
+    },
+    "border_color": "#1A1A1A",
+    "shadow_color": "#1A1A1A",
+    "interactive": {
+      "button_primary": "#A8E6CF",
+      "button_hover": "#86D4BA"
+    }
+  },
+  "typography": {
+    "import_url": "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Work+Sans:wght@400;500;700&display=swap');",
+    "headings": {
+      "font": "Outfit",
+      "weight": "font-black",
+      "style": "tracking-tighter uppercase text-[#1A1A1A]"
+    },
+    "body": {
+      "font": "Work Sans",
+      "weight": "font-medium",
+      "style": "leading-relaxed text-[#1A1A1A]"
+    },
+    "labels": {
+      "font": "Work Sans",
+      "weight": "font-bold",
+      "style": "tracking-[0.1em] uppercase text-xs text-[#1A1A1A]"
+    }
+  },
+  "spacing_and_layout": {
+    "general": "Generous padding (p-6, p-8) and thick margins to isolate elements.",
+    "grid": "Bento Grid Mode B (Control Room) but with neo-brutalist distinct cards.",
+    "borders": "border-2 or border-4 border-[#1A1A1A]",
+    "radius": "rounded-xl (mix hard edges with soft pastels)",
+    "shadows": "Hard drop shadows: shadow-[4px_4px_0px_#1A1A1A] or shadow-[6px_6px_0px_#1A1A1A]"
+  },
+  "components": {
+    "cards": "bg-white or pastel accent color, border-2 border-[#1A1A1A], shadow-[4px_4px_0px_#1A1A1A], hover:-translate-y-1 hover:shadow-[6px_6px_0px_#1A1A1A] transition-all rounded-xl",
+    "buttons": "bg-[#A8E6CF] text-[#1A1A1A] font-black uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[4px_4px_0px_#1A1A1A] active:translate-y-1 active:shadow-none transition-all px-6 py-3 rounded-xl",
+    "inputs": "bg-white border-2 border-[#1A1A1A] focus:ring-0 focus:outline-none focus:bg-[#FDFBF7] p-3 shadow-[2px_2px_0px_#1A1A1A] rounded-xl text-[#1A1A1A]",
+    "navigation": "Sticky top nav with solid background (bg-[#FDFBF7] with hard bottom border-2 border-[#1A1A1A]), z-50",
+    "charts": "Recharts inside neo-brutalist cards, use thick strokes (strokeWidth={3}), fill with pastel colors and thick borders."
+  },
+  "icons": {
+    "library": "@phosphor-icons/react",
+    "style": "weight='bold' or weight='duotone' to match the thick neo-brutalist aesthetic."
+  },
+  "media": [
+    {
+      "category": "hero_image",
+      "url": "https://images.pexels.com/photos/11427659/pexels-photo-11427659.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Close-up pink piggy bank on vibrant pink background for login/welcome screen"
+    },
+    {
+      "category": "currency_image",
+      "url": "https://images.unsplash.com/photo-1619718082268-5a1b74988497?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwyfHxldXJvJTIwY29pbnN8ZW58MHx8fHwxNzc1MTQ1MDk2fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Gold and silver round euro coins, useful for background or empty states"
+    }
+  ],
+  "accessibility": {
+    "contrast": "Extremely high contrast ensured by thick #1A1A1A borders and text against light pastel backgrounds.",
+    "testing": "All interactive elements MUST include data-testid attribute in kebab-case."
+  },
+  "instructions_to_main_agent": [
+    "Install the required libraries: yarn add @phosphor-icons/react recharts",
+    "Use Shadcn UI components but heavily customize them: remove default muted shadows and add border-2 border-[#1A1A1A] with shadow-[4px_4px_0px_#1A1A1A] instead.",
+    "For the main 'Huchas' (Piggy Banks) list, use an asymmetric bento grid. Render each hucha card with a different background color from the pastel accents (mint, lavender, peach, coral, yellow).",
+    "Ensure 'data-testid' is present on all forms, inputs, buttons, and hucha cards.",
+    "For the real-time balance, use large striking typography (Outfit text-5xl+ tracking-tighter).",
+    "Do NOT use glassmorphism or soft blurry shadows. This is a tactile Neo-brutalist design. Every surface is solid and defined by a hard black border.",
+    "The currency is restricted exclusively to Euros (€).",
+    "Implement the Transaction History and Statistics views using the specified Neo-Brutalist cards.",
+    "Add the font import to App.css or index.css and extend the tailwind theme font families."
+  ]
+}

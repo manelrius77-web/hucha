@@ -1,0 +1,627 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import './styles.css';
+import { db } from './firebase';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from 'firebase/firestore';
+
+function formatEuros(value) {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
+
+function App() {
+  const [huchas, setHuchas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [huchaSeleccionada, setHuchaSeleccionada] = useState(null);
+
+  const [nuevaHucha, setNuevaHucha] = useState({
+    nombre: '',
+    meta: '',
+    icono: '★',
+  });
+
+  const iconosDisponibles = ['★', '🩵', '✈', '🏖', '🚗', '🎁', '🎮', '🌈', '❤️', '🏠'];
+
+  const totalAhorrado = useMemo(() => {
+    return huchas.reduce((acc, item) => acc + Number(item.cantidad || 0), 0);
+  }, [huchas]);
+
+  useEffect(() => {
+    cargarHuchas();
+  }, []);
+
+  const cargarHuchas = async () => {
+    try {
+      setCargando(true);
+      const querySnapshot = await getDocs(collection(db, 'huchas'));
+      const datos = querySnapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
+      }));
+      setHuchas(datos);
+    } catch (error) {
+      console.error('Error cargando huchas:', error);
+      alert('No se pudieron cargar las huchas.');
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNuevaHucha((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const nombre = nuevaHucha.nombre.trim();
+    const meta = Number(nuevaHucha.meta);
+
+    if (!nombre || !meta || meta <= 0) {
+      alert('Introduce un nombre y una meta válida.');
+      return;
+    }
+
+    const nueva = {
+      nombre: nombre.toUpperCase(),
+      meta,
+      cantidad: 0,
+      icono: nuevaHucha.icono || '★',
+      color: 'default',
+      createdAt: new Date().toISOString(),
+    };
+
+    try {
+      const respuesta = await addDoc(collection(db, 'huchas'), nueva);
+
+      const huchaCreada = {
+        id: respuesta.id,
+        ...nueva,
+      };
+
+      setHuchas((prev) => [...prev, huchaCreada]);
+      setNuevaHucha({
+        nombre: '',
+        meta: '',
+        icono: '★',
+      });
+      setMostrarFormulario(false);
+    } catch (error) {
+      console.error('Error creando hucha:', error);
+      alert('No se pudo crear la hucha.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const confirmar = window.confirm('¿Seguro que quieres eliminar esta hucha?');
+    if (!confirmar) return;
+
+    try {
+      await deleteDoc(doc(db, 'huchas', id));
+      setHuchas((prev) => prev.filter((item) => item.id !== id));
+
+      if (huchaSeleccionada?.id === id) {
+        setHuchaSeleccionada(null);
+      }
+    } catch (error) {
+      console.error('Error eliminando hucha:', error);
+      alert('No se pudo eliminar la hucha.');
+    }
+  };
+
+  const actualizarHucha = async (huchaActualizada) => {
+    try {
+      const { id, ...datos } = huchaActualizada;
+      await updateDoc(doc(db, 'huchas', id), datos);
+
+      setHuchas((prev) =>
+        prev.map((item) => (item.id === id ? huchaActualizada : item))
+      );
+
+      if (huchaSeleccionada?.id === id) {
+        setHuchaSeleccionada(huchaActualizada);
+      }
+    } catch (error) {
+      console.error('Error actualizando hucha:', error);
+      alert('No se pudo actualizar la hucha.');
+    }
+  };
+
+  if (huchaSeleccionada) {
+    return (
+      <DetalleHucha
+        hucha={huchaSeleccionada}
+        volver={() => setHuchaSeleccionada(null)}
+        actualizarHucha={actualizarHucha}
+        eliminarHucha={handleDelete}
+      />
+    );
+  }
+
+  return (
+    <div className="app-shell">
+      <div className="phone-frame">
+        <header className="topbar">
+          <div className="brand">
+            <span className="pig">🐷</span>
+            <span className="brand-text">MIS HUCHAS</span>
+          </div>
+
+          <div className="top-actions">
+            <button className="icon-btn mint" type="button">
+              📊
+            </button>
+            <button className="icon-btn pink" type="button">
+              ↪
+            </button>
+          </div>
+        </header>
+
+        <div className="separator" />
+
+        <section className="hero">
+          <h1>HOLA, HIJO!</h1>
+
+          <div className="total-box">
+            <div className="coins">🪙</div>
+            <div>
+              <p className="label">TOTAL AHORRADO</p>
+              <p className="total">{formatEuros(totalAhorrado)}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="section-head">
+          <h2>TUS HUCHAS({huchas.length})</h2>
+          <button
+            className="new-btn"
+            type="button"
+            onClick={() => setMostrarFormulario((prev) => !prev)}
+          >
+            + NUEVA
+          </button>
+        </section>
+
+        {mostrarFormulario && (
+          <form className="new-form" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="nombre"
+              placeholder="Nombre"
+              value={nuevaHucha.nombre}
+              onChange={handleChange}
+            />
+
+            <input
+              type="number"
+              name="meta"
+              placeholder="Objetivo"
+              value={nuevaHucha.meta}
+              onChange={handleChange}
+              min="1"
+              step="0.01"
+            />
+
+            <select
+              name="icono"
+              className="icon-select"
+              value={nuevaHucha.icono}
+              onChange={handleChange}
+            >
+              {iconosDisponibles.map((icono) => (
+                <option key={icono} value={icono}>
+                  {icono}
+                </option>
+              ))}
+            </select>
+
+            <button type="submit">Guardar</button>
+          </form>
+        )}
+
+        {cargando ? (
+          <p className="loading-text">Cargando huchas...</p>
+        ) : (
+          <section className="cards">
+            {huchas.map((hucha) => {
+              const porcentaje = hucha.meta > 0
+                ? Math.min((Number(hucha.cantidad) / Number(hucha.meta)) * 100, 100)
+                : 0;
+
+              return (
+                <article
+                  className="card"
+                  key={hucha.id}
+                  onClick={() => setHuchaSeleccionada(hucha)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="card-top">
+                    <button
+                      className="delete-btn"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(hucha.id);
+                      }}
+                      aria-label={`Eliminar ${hucha.nombre}`}
+                    >
+                      🗑
+                    </button>
+
+                    <div className="card-icon">{hucha.icono}</div>
+                  </div>
+
+                  <div className="card-content">
+                    <h3>{hucha.nombre}</h3>
+                    <p className="amount">{formatEuros(hucha.cantidad)}</p>
+
+                    <div className="meta-row">
+                      <span className="meta-label">META</span>
+                      <span className="meta-value">{formatEuros(hucha.meta)}</span>
+                    </div>
+
+                    <div className="progress">
+                      <div
+                        className="progress-fill"
+                        style={{ width: `${porcentaje}%` }}
+                      />
+                    </div>
+
+                    <p className="progress-text">
+                      {Math.round(porcentaje)}% completado
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DetalleHucha({ hucha, volver, actualizarHucha, eliminarHucha }) {
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [cantidadAgregar, setCantidadAgregar] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [mostrarModalRetirar, setMostrarModalRetirar] = useState(false);
+  const [cantidadRetirar, setCantidadRetirar] = useState('');
+  const [descripcionRetirar, setDescripcionRetirar] = useState('');
+  const [mostrarModalMonedas, setMostrarModalMonedas] = useState(false);
+  const [mostrarModalBilletes, setMostrarModalBilletes] = useState(false);
+
+
+  const porcentaje = hucha.meta > 0
+    ? Math.min((Number(hucha.cantidad) / Number(hucha.meta)) * 100, 100)
+    : 0;
+
+  const faltan = Math.max(Number(hucha.meta) - Number(hucha.cantidad), 0);
+
+  const handleConfirmarAgregar = () => {
+    const importe = Number(cantidadAgregar);
+
+    if (!importe || importe <= 0) {
+      alert('Introduce una cantidad válida.');
+      return;
+    }
+
+    const huchaActualizada = {
+      ...hucha,
+      cantidad: Number((Number(hucha.cantidad) + importe).toFixed(2)),
+      ultimaDescripcion: descripcion || '',
+    };
+
+    actualizarHucha(huchaActualizada);
+    setCantidadAgregar('');
+    setDescripcion('');
+    setMostrarModal(false);
+  };
+
+  const handleConfirmarRetirar = () => {
+    const importe = Number(cantidadRetirar);
+
+    if (!importe || importe <= 0) {
+      alert('Introduce una cantidad válida.');
+      return;
+    }
+
+    if (importe > Number(hucha.cantidad)) {
+      alert('No puedes retirar más dinero del que hay.');
+      return;
+    }
+
+    const huchaActualizada = {
+      ...hucha,
+      cantidad: Number((Number(hucha.cantidad) - importe).toFixed(2)),
+      ultimaDescripcion: descripcionRetirar || '',
+    };
+
+    actualizarHucha(huchaActualizada);
+    setCantidadRetirar('');
+    setDescripcionRetirar('');
+    setMostrarModalRetirar(false);
+  };
+
+  return (
+    
+    <div className="app-shell">
+      <div className="phone-frame">
+        <header className="topbar">
+          <button className="new-btn" type="button" onClick={volver}>
+            ← VOLVER
+          </button>
+
+          <button
+            className="icon-btn pink"
+            type="button"
+            onClick={() => {
+              eliminarHucha(hucha.id);
+              volver();
+            }}
+          >
+            🗑
+          </button>
+        </header>
+
+        <div className="separator" />
+
+        <section className="card detalle">
+          <div className="detalle-head">
+            <div>
+              <h1>{hucha.nombre}</h1>
+              <p className="label">SALDO ACTUAL</p>
+              <p className="total">{formatEuros(hucha.cantidad)}</p>
+            </div>
+
+            <div className="detalle-icono">{hucha.icono}</div>
+          </div>
+
+          <div className="meta-row">
+            <span className="meta-label">META</span>
+            <span className="meta-value">{formatEuros(hucha.meta)}</span>
+          </div>
+
+          <div className="progress">
+            <div
+              className="progress-fill"
+              style={{ width: `${porcentaje}%` }}
+            />
+          </div>
+
+          <p className="progress-text">
+            {Math.round(porcentaje)}% completado - Faltan {formatEuros(faltan)}
+          </p>
+
+          <button
+            className="new-btn"
+            type="button"
+            onClick={() => setMostrarModal(true)}
+          >
+            + AÑADIR DINERO
+          </button>
+
+          <button
+            className="new-btn retirar-btn"
+            type="button"
+            onClick={() => setMostrarModalRetirar(true)}
+          >
+            − RETIRAR DINERO
+          </button>
+        </section>
+
+        {mostrarModal && (
+          <div className="modal-overlay">
+            <div className="modal-box">
+              <div className="modal-header">
+                <h2>AÑADIR DINERO</h2>
+                <button
+                  type="button"
+                  className="modal-close"
+                  onClick={() => setMostrarModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="modal-tabs">
+                <button type="button" className="tab-btn">
+                  CANTIDAD TOTAL
+                </button>
+                <button type="button" className="tab-btn active">
+                  MONEDAS/BILLETES
+                </button>
+              </div>
+
+              <div className="modal-total-row">
+                <span>SELECCIONA TIPO</span>
+                <div className="modal-total-box">
+                  <span className="mini-label">TOTAL</span>
+                  <strong>{formatEuros(Number(cantidadAgregar || 0))}</strong>
+                </div>
+              </div>
+
+              <button
+  type="button"
+  className="modal-action green"
+  onClick={() => setMostrarModalMonedas(true)}
+  
+>
+  AÑADIR MONEDAS
+  
+  <span>0 TIPOS</span>
+ 
+</button>
+
+<button
+
+  type="button"
+  className="modal-action orange"
+  onClick={() => setMostrarModalBilletes(true)}
+>
+  AÑADIR BILLETES
+  <span>0 TIPOS</span>
+</button>
+              <label className="modal-label">CANTIDAD TOTAL</label>
+              <input
+                className="modal-input"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Ej: 18"
+                value={cantidadAgregar}
+                onChange={(e) => setCantidadAgregar(e.target.value)}
+              />
+
+              <label className="modal-label">DESCRIPCIÓN (OPCIONAL)</label>
+              <input
+                className="modal-input"
+                type="text"
+                placeholder="Ej: Ahorro mensual, Regalo..."
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+              />
+
+              <div className="modal-buttons">
+                <button
+                  type="button"
+                  className="modal-footer-btn cancel"
+                  onClick={() => setMostrarModal(false)}
+                >
+                  CANCELAR
+                </button>
+
+                <button
+                  type="button"
+                  className="modal-footer-btn confirm"
+                  onClick={handleConfirmarAgregar}
+                >
+                  CONFIRMAR
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {mostrarModalRetirar && (
+          <div className="modal-overlay">
+            <div className="modal-box">
+              <div className="modal-header">
+                <h2>RETIRAR DINERO</h2>
+                <button
+                  type="button"
+                  className="modal-close"
+                  onClick={() => setMostrarModalRetirar(false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="modal-total-row">
+                <span>SALDO DISPONIBLE</span>
+                <div className="modal-total-box orange-box">
+                  <span className="mini-label">SALDO</span>
+                  <strong>{formatEuros(hucha.cantidad)}</strong>
+                </div>
+              </div>
+
+              <label className="modal-label">CANTIDAD A RETIRAR</label>
+              <input
+                className="modal-input"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Ej: 10"
+                value={cantidadRetirar}
+                onChange={(e) => setCantidadRetirar(e.target.value)}
+              />
+
+              <label className="modal-label">DESCRIPCIÓN (OPCIONAL)</label>
+              <input
+                className="modal-input"
+                type="text"
+                placeholder="Ej: Comprar regalo"
+                value={descripcionRetirar}
+                onChange={(e) => setDescripcionRetirar(e.target.value)}
+              />
+
+              <div className="modal-buttons">
+                <button
+                  type="button"
+                  className="modal-footer-btn cancel"
+                  onClick={() => setMostrarModalRetirar(false)}
+                >
+                  CANCELAR
+                </button>
+
+                <button
+                  type="button"
+                  className="modal-footer-btn confirm"
+                  onClick={handleConfirmarRetirar}
+                >
+                  CONFIRMAR
+                </button>
+              </div>
+            </div>
+          </div>
+          
+        )}
+        {mostrarModalMonedas && (
+         <div className="modal-overlay">
+          <div className="selector-box">
+           <div className="selector-header">
+             <h2>AÑADIR MONEDAS</h2>
+             <button
+              type="button"
+              className="modal-close"
+              onClick={() => setMostrarModalMonedas(false)}
+            >
+              ✕
+             </button>
+            </div>
+
+           <div className="selector-grid">
+            {['1c', '2c', '5c', '10c', '20c', '50c', '1€', '2€'].map((valor) => (
+             <div className="selector-card" key={valor}>
+              <div className="selector-value">{valor}</div>
+               <button type="button" className="selector-plus">+</button>
+                <div className="selector-count">0</div>
+                  <button type="button" className="selector-minus">−</button>
+                
+                </div>
+              
+          ))}
+             </div>
+
+              <button
+              type="button"
+              className="selector-done"
+              onClick={() => setMostrarModalMonedas(false)}
+            >
+              LISTO
+             </button>
+           </div>
+        </div>
+    )}
+
+      </div>
+    </div>
+  );
+  
+}
+
+export default App;

@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Work+Sans:wght@400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Work Sans', sans-serif;
+  background-color: #FDFBF7;
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* Neo-brutalist button styles */
+.neo-button {
+  background-color: #A8E6CF;
+  color: #1A1A1A;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 2px solid #1A1A1A;
+  box-shadow: 4px 4px 0px #1A1A1A;
+  transition: all 0.2s;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.neo-button:hover {
+  background-color: #86D4BA;
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px #1A1A1A;
+}
+
+.neo-button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.neo-button-secondary {
+  background-color: #FFD3B6;
+}
+
+.neo-button-secondary:hover {
+  background-color: #FFC299;
+}
+
+.neo-button-danger {
+  background-color: #FF9B9B;
+}
+
+.neo-button-danger:hover {
+  background-color: #FF7F7F;
+}
+
+/* Neo-brutalist card styles */
+.neo-card {
+  background-color: white;
+  border: 2px solid #1A1A1A;
+  box-shadow: 4px 4px 0px #1A1A1A;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.neo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0px #1A1A1A;
+}
+
+/* Neo-brutalist input styles */
+.neo-input {
+  background-color: white;
+  border: 2px solid #1A1A1A;
+  box-shadow: 2px 2px 0px #1A1A1A;
+  border-radius: 12px;
+  padding: 12px;
+  color: #1A1A1A;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.neo-input:focus {
+  outline: none;
+  background-color: #FDFBF7;
+  box-shadow: 3px 3px 0px #1A1A1A;
+}
+
+/* Color variants for piggy banks */
+.bg-mint {
+  background-color: #A8E6CF;
+}
+
+.bg-lavender {
+  background-color: #DCD3FF;
+}
+
+.bg-peach {
+  background-color: #FFD3B6;
+}
+
+.bg-coral {
+  background-color: #FF9B9B;
+}
+
+.bg-yellow {
+  background-color: #FFE8A1;
+}
+
+/* Loading spinner */
+.spinner {
+  border: 3px solid #1A1A1A;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
