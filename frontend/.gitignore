@@ -1,5 +1,4 @@
 # Capacitor
-ios/
 android/
 *.keystore
 key.properties

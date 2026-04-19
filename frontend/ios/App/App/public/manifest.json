@@ -1,0 +1,27 @@
+{
+  "short_name": "Mis Huchas",
+  "name": "Mis Huchas - Control de Ahorros",
+  "description": "Aplicación para controlar tus ahorros en diferentes huchas personalizadas",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#A8E6CF",
+  "background_color": "#FDFBF7",
+  "orientation": "portrait"
+}
