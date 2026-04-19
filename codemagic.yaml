@@ -1,54 +1,43 @@
 workflows:
-  ios-hucha:
-    name: Hucha iOS
-    max_build_duration: 120
+  ios-capacitor:
+    name: iOS Capacitor Build
+    max_build_duration: 60
     instance_type: mac_mini_m1
 
-    integrations:
-      app_store_connect: Codemagic API
-
     environment:
-      node: 20
-      xcode: 16.0
-      cocoapods: default
-      vars:
-        XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.manelrius.huchas"
-      groups:
-        - capacitor_config
+      node: 22
+      xcode: latest
 
     scripts:
-      - name: Install deps
+      - name: Install dependencies
         script: |
           cd frontend
-          npm install --legacy-peer-deps
+          npm install
 
       - name: Build web
         script: |
           cd frontend
           npm run build
 
-      - name: Capacitor sync
+      - name: Sync Capacitor
         script: |
           cd frontend
           npx cap sync ios
 
-      - name: Pods
+      - name: CocoaPods install
         script: |
           cd frontend/ios/App
           pod install
 
-      - name: Code signing
+      - name: Build iOS (no firma)
         script: |
-          xcode-project use-profiles
-
-      - name: Build IPA
-        script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          cd frontend/ios/App
+          xcodebuild -workspace App.xcworkspace \
+          -scheme App \
+          -sdk iphoneos \
+          -configuration Release \
+          archive -archivePath $HOME/build/App.xcarchive \
+          CODE_SIGNING_ALLOWED=NO
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
+      - $HOME/build/*.xcarchive
