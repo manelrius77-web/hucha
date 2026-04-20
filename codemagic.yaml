@@ -7,9 +7,11 @@ workflows:
     environment:
       node: 22
       xcode: 16.0
+      ios_signing:
+        distribution_type: development
+        bundle_identifier: com.manelrius.huchas
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
-        TEAM_ID: "W27J7P3Z8R"
 
     scripts:
       - name: Install dependencies
@@ -27,42 +29,18 @@ workflows:
           cd frontend
           npx cap sync ios
 
-      - name: Create exportOptions.plist
+      - name: Apply provisioning profiles to Xcode project
         script: |
-          cat > frontend/ios/App/exportOptions.plist <<'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>development</string>
-            <key>signingStyle</key>
-            <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
+          xcode-project use-profiles
 
-      - name: Build iOS archive
+      - name: Build IPA
         script: |
           cd frontend/ios/App
-          xcodebuild -project App.xcodeproj \
-            -scheme App \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath $HOME/build/App.xcarchive \
-            DEVELOPMENT_TEAM=$TEAM_ID \
-            PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID \
-            archive
-
-      - name: Export IPA
-        script: |
-          cd frontend/ios/App
-          xcodebuild -exportArchive \
-            -archivePath $HOME/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $HOME/build/exported
+          xcode-project build-ipa \
+            --project App.xcodeproj
 
     artifacts:
-      - $HOME/build/App.xcarchive
-      - $HOME/build/exported/*.ipa
+      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
