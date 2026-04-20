@@ -8,7 +8,7 @@ workflows:
       node: 22
       xcode: 16.0
       vars:
-        BUNDLE_ID: "com.manelrius.hucha"
+        BUNDLE_ID: "com.manelrius.huchas"
         TEAM_ID: "W27J7P3Z8R"
 
     scripts:
