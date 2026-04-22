@@ -40,6 +40,11 @@ workflows:
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
+      - name: Ensure clean build
+        script: |
+          cd frontend
+            rm -rf node_modules package-lock.json
+            npm install --legacy-peer-deps
 
     artifacts:
       - build/ios/ipa/*.ipa
