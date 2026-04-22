@@ -7,13 +7,13 @@ workflows:
     environment:
       node: 20
       xcode: 16.0
+
       ios_signing:
-        environment:
-    ios_signing:
-      distribution_type: app_store
-      bundle_identifier: com.manelrius.huchas
-      provisioning_profiles:
-      - Huchas AppStore
+        distribution_type: app_store
+        bundle_identifier: com.manelrius.huchas
+        provisioning_profiles:
+          - Huchas AppStore
+
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
         XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
