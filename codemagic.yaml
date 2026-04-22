@@ -6,7 +6,7 @@ workflows:
 
     environment:
       node: 20
-      xcode: 15.4
+      xcode: 16.0
 
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
