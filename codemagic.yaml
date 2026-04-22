@@ -14,8 +14,6 @@ workflows:
         XCODE_SCHEME: "App"
 
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.manelrius.huchas
         provisioning_profiles:
           - huchas_profile
 
