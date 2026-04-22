@@ -11,8 +11,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.manelrius.huchas
-        provisioning_profiles:
-          - Huchas AppStore
 
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
@@ -20,10 +18,9 @@ workflows:
         XCODE_SCHEME: "App"
 
     scripts:
-      - name: Clean & install
+      - name: Install dependencies
         script: |
           cd frontend
-          rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
 
       - name: Build web
@@ -35,10 +32,6 @@ workflows:
         script: |
           cd frontend
           npx cap sync ios
-
-      - name: Apply provisioning profiles
-        script: |
-          xcode-project use-profiles
 
       - name: Build IPA
         script: |
