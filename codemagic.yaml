@@ -8,14 +8,14 @@ workflows:
       node: 22
       xcode: 16.0
 
+      vars:
+        BUNDLE_ID: "com.manelrius.huchas"
+        XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.manelrius.huchas
-
-    vars:
-      BUNDLE_ID: "com.manelrius.huchas"
-      XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
-      XCODE_SCHEME: "App"
 
     scripts:
       - name: Install dependencies
