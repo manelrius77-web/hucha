@@ -10,6 +10,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.manelrius.huchas
+        automatic_code_signing: true
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
         XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
