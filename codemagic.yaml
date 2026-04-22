@@ -8,7 +8,7 @@ workflows:
       node: 22
       xcode: 16.0
       ios_signing:
-        distribution_type: development
+        distribution_type: app_store
         bundle_identifier: com.manelrius.huchas
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
