@@ -23,11 +23,6 @@ workflows:
           cd frontend
           npm run build
 
-      - name: Sync Capacitor
-        script: |
-          cd frontend
-          npx cap sync ios
-
       - name: Build iOS
         script: |
           xcodebuild \
