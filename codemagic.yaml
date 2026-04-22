@@ -8,21 +8,22 @@ workflows:
       node: 22
       xcode: 16.0
 
-      vars:
-        BUNDLE_ID: "com.manelrius.huchas"
-        XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
+    vars:
+      BUNDLE_ID: "com.manelrius.huchas"
+      XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
+      XCODE_SCHEME: "App"
 
-      ios_signing:
-        provisioning_profiles:
-          huchas-riuse ✅
+    ios_signing:
+      provisioning_profiles:
+        - huchas-riuse
+
     scripts:
       - name: Install dependencies
         script: |
           cd frontend
           npm install --legacy-peer-deps
 
-      - name: Build web
+      - name: Build web app
         script: |
           cd frontend
           npm run build
@@ -34,11 +35,12 @@ workflows:
 
       - name: Build iOS
         script: |
-          xcodebuild -workspace "$XCODE_WORKSPACE" \
-                     -scheme "$XCODE_SCHEME" \
-                     -configuration Release \
-                     -sdk iphoneos \
-                     build
+          xcodebuild \
+            -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $CM_BUILD_DIR/build/App.xcarchive archive
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/App.xcarchive
