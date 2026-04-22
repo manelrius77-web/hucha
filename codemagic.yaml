@@ -6,11 +6,15 @@ workflows:
 
     environment:
       node: 20
-      xcode: 16.0
+      xcode: 15.4
+
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
         XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
+
+    integrations:
+      app_store_connect: Codemagic API
 
     scripts:
       - name: Install dependencies
@@ -28,11 +32,18 @@ workflows:
           cd frontend
           npx cap sync ios
 
-      - name: Build IPA
+      - name: Build iOS
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          xcodebuild \
+          -workspace $XCODE_WORKSPACE \
+          -scheme $XCODE_SCHEME \
+          -configuration Release \
+          -archivePath build/App.xcarchive \
+          archive
 
     artifacts:
       - build/ios/ipa/*.ipa
+
+    publishing:
+      app_store_connect:
+        auth: integration
