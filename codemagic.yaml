@@ -12,6 +12,8 @@ workflows:
         bundle_identifier: com.manelrius.huchas
       vars:
         BUNDLE_ID: "com.manelrius.huchas"
+        XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
 
     scripts:
       - name: Install dependencies
@@ -24,23 +26,23 @@ workflows:
           cd frontend
           npm run build
 
-      - name: Sync Capacitor
+      - name: Sync Capacitor iOS
         script: |
           cd frontend
           npx cap sync ios
 
-      - name: Apply provisioning profiles to Xcode project
+      - name: Apply provisioning profiles
         script: |
           xcode-project use-profiles
 
       - name: Build IPA
         script: |
-          cd frontend/ios/App
           xcode-project build-ipa \
-            --project App.xcodeproj
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
 
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM.zip
