@@ -12,10 +12,6 @@ workflows:
         XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
 
-    ios_signing:
-      provisioning_profiles:
-        - huchas-riuse
-
     scripts:
       - name: Install dependencies
         script: |
