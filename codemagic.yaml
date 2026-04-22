@@ -15,8 +15,7 @@ workflows:
 
       ios_signing:
         provisioning_profiles:
-          - huchas-riuse
-
+          huchas-riuse ✅
     scripts:
       - name: Install dependencies
         script: |
