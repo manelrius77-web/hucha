@@ -30,7 +30,7 @@ workflows:
       - name: Build iOS
         script: |
           xcodebuild \
-            -workspace frontend/ios/App.xcworkspace \
+            -workspace frontend/ios/App/App.xcworkspace
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
