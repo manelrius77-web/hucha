@@ -7,10 +7,6 @@ workflows:
     environment:
       node: 22
       xcode: 16.0
-      vars:
-        BUNDLE_ID: "com.manelrius.huchas"
-        XCODE_WORKSPACE: "frontend/ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
 
     scripts:
       - name: Install dependencies
@@ -23,14 +19,25 @@ workflows:
           cd frontend
           npm run build
 
+      - name: Sync Capacitor
+        script: |
+          cd frontend
+          npx cap sync ios
+
       - name: Build iOS
         script: |
           xcodebuild \
-            -workspace "$XCODE_WORKSPACE" \
-            -scheme "$XCODE_SCHEME" \
+            -workspace frontend/ios/App.xcworkspace \
+            -scheme App \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath $CM_BUILD_DIR/build/App.xcarchive archive
+            -archivePath build/App.xcarchive \
+            archive
 
     artifacts:
       - build/App.xcarchive
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
